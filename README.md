@@ -6,3 +6,7 @@ A MXNet CTPN implementation mimic of eragonruan's [tensorflow implementation](ht
 ## References
 1. https://github.com/tianzhi0549/CTPN
 2. https://github.com/eragonruan/text-detection-ctpn
+
+## Our results
+`NOTICE:` all the photos used below are collected from the internet. If it affects you, please contact me to delete them.
+<img src="/results/demo.jpg" width=320 height=240 /><img src="/data/results/002.jpg" width=320 height=240 />
