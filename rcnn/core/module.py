@@ -207,7 +207,7 @@ class MutableModule(BaseModule):
             #                 logger=self.logger, context=self._context,
             #                 work_load_list=self._work_load_list,
             #                 fixed_param_names=self._fixed_param_names)
-            sym = self._gen_sym(input_shapes, len(ctx) if isinstance(self._context, list) else 1)
+            sym = self._gen_sym(input_shapes, len(self._context) if isinstance(self._context, list) else 1)
             self._curr_module._symbol = sym
             self._curr_module.binded=False
             self._curr_module.bind(data_batch.provide_data, data_batch.provide_label, self._curr_module.for_training,
