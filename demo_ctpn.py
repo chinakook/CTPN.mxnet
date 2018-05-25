@@ -22,73 +22,32 @@ import mxnet as mx
 import numpy as np
 from rcnn.logger import logger
 from rcnn.config import config
-from rcnn.symbol import get_vgg_text_rpn_test
+from rcnn.symbol import get_vgg_text_rpn_test, gensym
 from rcnn.io.image import resize, transform
 from rcnn.core.tester import Predictor, im_detect, im_rpn_detect, im_proposal, vis_all_detection, draw_all_detection
 from rcnn.utils.load_model import load_param
-from rcnn.processing.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
 
-from rcnn.text_connector import text_proposal_connector
+from rcnn.text_connector.detectors import TextDetector
 
 import matplotlib.pyplot as plt
 import random
 import logging
 
-CLASSES = ('__background__',
-           'aeroplane', 'bicycle', 'bird', 'boat',
-           'bottle', 'bus', 'car', 'cat', 'chair',
-           'cow', 'diningtable', 'dog', 'horse',
-           'motorbike', 'person', 'pottedplant',
-           'sheep', 'sofa', 'train', 'tvmonitor')
-config.TEST.HAS_RPN = True
 SHORT_SIDE = config.SCALES[0][0]
 LONG_SIDE = config.SCALES[0][1]
 PIXEL_MEANS = config.PIXEL_MEANS
 DATA_NAMES = ['data', 'im_info']
 LABEL_NAMES = None
-DATA_SHAPES = [('data', (1, 3, 600, 1000)), ('im_info', (1, 3))]
+DATA_SHAPES = [('data', (1, 3, SHORT_SIDE, LONG_SIDE)), ('im_info', (1, 3))]
 LABEL_SHAPES = None
 # visualization
 CONF_THRESH = 0.7
 NMS_THRESH = 0.3
-nms = py_nms_wrapper(NMS_THRESH)
-
-def gen_sym_infer(data_shape_dict, ctxlen):
-    s0 = data_shape_dict["data"]
-    s1 = data_shape_dict["im_info"]
-    data = mx.symbol.Variable(name="data", shape=(s0[0]//ctxlen, s0[1], s0[2], s0[3]))
-    im_info = mx.symbol.Variable(name='im_info', shape=(s1[0]//ctxlen, s1[1]))
-    return get_vgg_text_rpn_test(data, im_info)
 
 def get_net(prefix, epoch, ctx):
     arg_params, aux_params = load_param(prefix, epoch, convert=True, ctx=ctx, process=True)
 
-    # infer shape
-    data_shape_dict = dict(DATA_SHAPES)
-
-    symbol = gen_sym_infer(data_shape_dict, len(ctx) if isinstance(ctx, list) else 1)
-    # data = mx.symbol.Variable(name="data", shape=(1,3,600,903))
-    # im_info = mx.symbol.Variable(name="im_info", shape=(1,3))
-    # symbol = get_vgg_text_rpn_test(data, im_info)
-
-    arg_names, aux_names = symbol.list_arguments(), symbol.list_auxiliary_states()
-    arg_shape, _, aux_shape = symbol.infer_shape_partial()
-    arg_shape_dict = dict(zip(arg_names, arg_shape))
-    aux_shape_dict = dict(zip(aux_names, aux_shape))
-
-    # check shapes
-    for k in symbol.list_arguments():
-        if k in data_shape_dict or 'label' in k:
-            continue
-        assert k in arg_params, k + ' not initialized'
-        assert arg_params[k].shape == arg_shape_dict[k], \
-            'shape inconsistent for ' + k + ' inferred ' + str(arg_shape_dict[k]) + ' provided ' + str(arg_params[k].shape)
-    for k in symbol.list_auxiliary_states():
-        assert k in aux_params, k + ' not initialized'
-        assert aux_params[k].shape == aux_shape_dict[k], \
-            'shape inconsistent for ' + k + ' inferred ' + str(aux_shape_dict[k]) + ' provided ' + str(aux_params[k].shape)
-
-    predictor = Predictor(gen_sym_infer, DATA_NAMES, LABEL_NAMES, context=ctx, max_data_shapes=data_shape_dict,
+    predictor = Predictor(gensym.gen_sym_infer, DATA_NAMES, LABEL_NAMES, context=ctx, max_data_shapes= dict(DATA_SHAPES),
                           provide_data=DATA_SHAPES, provide_label=LABEL_SHAPES,
                           arg_params=arg_params, aux_params=aux_params)
     return predictor
@@ -111,25 +70,7 @@ def generate_batch(im):
     data_batch = mx.io.DataBatch(data=data, label=None, provide_data=data_shapes, provide_label=None)
     return data_batch, DATA_NAMES, im_scale
 
-
-def filter_boxes(boxes):
-    heights=np.zeros((len(boxes), 1), np.float)
-    widths=np.zeros((len(boxes), 1), np.float)
-    scores=np.zeros((len(boxes), 1), np.float)
-    index=0
-    for box in boxes:
-        heights[index]=(abs(box[5]-box[1])+abs(box[7]-box[3]))/2.0+1
-        widths[index]=(abs(box[2]-box[0])+abs(box[6]-box[4]))/2.0+1
-        scores[index] = box[8]
-        index += 1
-    MIN_RATIO=0.5
-    LINE_MIN_SCORE=0.9
-    TEXT_PROPOSALS_WIDTH=16
-    MIN_NUM_PROPOSALS = 2
-    return np.where((widths/heights>MIN_RATIO) & (scores>LINE_MIN_SCORE) &
-                        (widths>(TEXT_PROPOSALS_WIDTH*MIN_NUM_PROPOSALS)))[0]
-
-def demo_net(predictor, image_name, vis=False):
+def demo_net(predictor, detector, image_name):
     """
     generate data_batch -> im_detect -> post process
     :param predictor: Predictor
@@ -142,71 +83,26 @@ def demo_net(predictor, image_name, vis=False):
     data_batch, data_names, im_scale = generate_batch(im)
     scores, boxes, data_dict = im_rpn_detect(predictor, data_batch, data_names, im_scale)
 
-    keep = np.where(scores >= CONF_THRESH)[0]
+    textrois = detector.detect(boxes, scores, (im.shape[0], im.shape[1]))
 
-    #sorted_indices = np.argsort(scores.ravel())[::-1]
-    #boxes, scores = boxes[sorted_indices], scores[sorted_indices]
-
-    
-
-
-    dets = np.hstack((boxes, scores)).astype(np.float32)[keep, :]
-    keep = nms(dets)
-
-    boxes, scores = boxes[keep], scores[keep]
-
-    tpc = text_proposal_connector.TextProposalConnector()
-    im_size = (im.shape[0], im.shape[1])
-    text_rects = tpc.get_text_lines(boxes, scores, im_size)
-    keep_inds = filter_boxes(text_rects)
-    print(text_rects[keep_inds])
-
-    all_boxes = text_rects[keep_inds] #dets[keep, :]
-
-    #print(boxes)
-    plt.imshow(im)
-    for bbox in all_boxes:
+    #plt.imshow(im[:,:,::-1])
+    for bbox in textrois:
         x0, y0, x1, y1 = bbox[0], bbox[1], bbox[2], bbox[5]
-        color = (random.random(), random.random(), random.random())
+        # color = (random.random(), random.random(), random.random())
+        color = (0,1,0)
         
         rect = plt.Rectangle((x0, y0),
                                 x1 - x0,
                                 y1 - y0, fill=False,
                                 edgecolor=color, linewidth=1.0)
-        plt.gca().add_patch(rect)        
-        # cv2.rectangle(im, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
-        #     (0,255,0), 1)
-    #cv2.imshow("w", im)
-    #cv2.waitKey()
-    plt.show()
-    # all_boxes = [[] for _ in CLASSES]
-    # for cls in CLASSES:
-    #     cls_ind = CLASSES.index(cls)
-    #     cls_boxes = boxes[:, 4 * cls_ind:4 * (cls_ind + 1)]
-    #     # cls_scores = scores[:, cls_ind, np.newaxis]
-    #     # keep = np.where(cls_scores >= CONF_THRESH)[0]
-    #     # dets = np.hstack((cls_boxes, cls_scores)).astype(np.float32)[keep, :]
-    #     # keep = nms(dets)
-    #     all_boxes[cls_ind] = cls_boxes #dets[keep, :]
-
-    # boxes_this_image = [[]] + [all_boxes[j] for j in range(1, len(CLASSES))]
-
-    # # print results
-    # logger.info('---class---')
-    # logger.info('[[x1, x2, y1, y2, confidence]]')
-    # for ind, boxes in enumerate(boxes_this_image):
-    #     if len(boxes) > 0:
-    #         logger.info('---%s---' % CLASSES[ind])
-    #         logger.info('%s' % boxes)
-
-    # if vis:
-    #     vis_all_detection(data_dict['data'].asnumpy(), boxes_this_image, CLASSES, im_scale)
-    # else:
-    #     result_file = image_name.replace('.', '_result.')
-    #     logger.info('results saved to %s' % result_file)
-    #     im = draw_all_detection(data_dict['data'].asnumpy(), boxes_this_image, CLASSES, im_scale)
-    #     cv2.imwrite(result_file, im)
-
+        #plt.gca().add_patch(rect)        
+        cv2.rectangle(im, (int(x0), int(y0)), (int(x1), int(y1)),
+            (0,0,255), 2)
+    #im = cv2.resize(im, (320, 240))
+    #cv2.imwrite('results/demo.jpg', im)
+    cv2.imshow("w", im)
+    cv2.waitKey()
+    #plt.show()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Demonstrate a Faster R-CNN network')
@@ -221,13 +117,19 @@ def parse_args():
 
 def main():
 
-    logger.setLevel(logging.DEBUG)
+    #logger.setLevel(logging.DEBUG)
 
     args = parse_args()
     ctx = mx.gpu(args.gpu)
 
     predictor = get_net(args.prefix, args.epoch, ctx)
-    demo_net(predictor, args.image, args.vis)
+
+    detector = TextDetector()
+    
+    # path = '/mnt/6B133E147DED759E/VOCdevkit/VOC2007/train/JPEGImages'
+    # flist = [path + '/' + fn for fn in os.listdir(path)]
+    # for fn in flist:
+    demo_net(predictor, detector, args.image)
 
 
 if __name__ == '__main__':

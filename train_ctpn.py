@@ -15,6 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import os
+os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT']='0'
+
 import argparse
 import mxnet as mx
 

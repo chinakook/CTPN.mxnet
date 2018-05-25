@@ -16,8 +16,9 @@
 # under the License.
 
 """A `MutableModule` implement the `BaseModule` API, and allows input shape
-varying with training iterations. If shapes vary, executors will rebind,
-using shared arrays from the initial module binded with maximum shape.
+varying and dynamic graph creating with training iterations. If shapes vary
+and graph change, executors will rebind, using shared arrays from the initial
+module binded with maximum shape.
 """
 
 import logging
@@ -26,8 +27,6 @@ from mxnet import context as ctx
 from mxnet.initializer import Uniform
 from mxnet.module.base_module import BaseModule
 from mxnet.module.module import Module
-
-#from ..symbol.gensym import gen_sym
 
 class MutableModule(BaseModule):
     """A mutable module is a module that supports variable input data.
@@ -49,14 +48,14 @@ class MutableModule(BaseModule):
                  max_data_shapes=None, max_label_shapes=None, fixed_param_prefix=None):
         super(MutableModule, self).__init__(logger=logger)
         self._gen_sym = gen_sym
+        self._data_names = data_names
+        self._label_names = label_names
+        self._context = context
         if max_label_shapes is None:
             inputs = dict(max_data_shapes)
         else:
             inputs = dict(max_data_shapes+max_label_shapes)
-        self._symbol = gen_sym(inputs, len(ctx) if isinstance(ctx, list) else 1)
-        self._data_names = data_names
-        self._label_names = label_names
-        self._context = context
+        self._symbol = gen_sym(inputs, len(self._context) if isinstance(self._context, list) else 1)
         self._work_load_list = work_load_list
 
         self._curr_module = None
@@ -158,7 +157,6 @@ class MutableModule(BaseModule):
         if len(max_label_shapes) == 0:
             max_label_shapes = None
         
-        #sym = self._gen_sym(dict(max_data_shapes+max_label_shapes), len(ctx) if isinstance(self._context, list) else 1)
         module = Module(self._symbol, self._data_names, self._label_names, logger=self.logger,
                         context=self._context, work_load_list=self._work_load_list,
                         fixed_param_names=self._fixed_param_names)
@@ -203,17 +201,12 @@ class MutableModule(BaseModule):
                 shape_changed = True
 
         if shape_changed:
-            # module = Module(self._symbol, self._data_names, self._label_names,
-            #                 logger=self.logger, context=self._context,
-            #                 work_load_list=self._work_load_list,
-            #                 fixed_param_names=self._fixed_param_names)
-            sym = self._gen_sym(input_shapes, len(ctx) if isinstance(self._context, list) else 1)
+            sym = self._gen_sym(input_shapes, len(self._context) if isinstance(self._context, list) else 1)
             self._curr_module._symbol = sym
             self._curr_module.binded=False
             self._curr_module.bind(data_batch.provide_data, data_batch.provide_label, self._curr_module.for_training,
                         self._curr_module.inputs_need_grad, force_rebind=False,
                         shared_module=self._curr_module)
-            #self._curr_module = module
 
         self._curr_module.forward(data_batch, is_train=is_train)
 

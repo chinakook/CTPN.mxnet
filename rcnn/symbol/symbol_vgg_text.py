@@ -89,10 +89,6 @@ def get_vgg_text_rpn(data, label, bbox_target, bbox_weight, num_anchors=10):
     :param num_anchors: used to determine output size
     :return: Symbol
     """
-    # data = mx.symbol.Variable(name="data")
-    # label = mx.symbol.Variable(name='label')
-    # bbox_target = mx.symbol.Variable(name='bbox_target')
-    # bbox_weight = mx.symbol.Variable(name='bbox_weight')
 
     # shared convolutional layers
     relu5_3 = get_vgg_text_conv(data)
@@ -143,8 +139,6 @@ def get_vgg_text_rpn_test(data, im_info, num_anchors=10):
     :param num_anchors: used to determine output size
     :return: Symbol
     """
-    # data = mx.symbol.Variable(name="data")
-    # im_info = mx.symbol.Variable(name="im_info")
 
     # shared convolutional layers
     relu5_3 = get_vgg_text_conv(data)

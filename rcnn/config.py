@@ -112,7 +112,7 @@ default = edict()
 default.network = 'vgg_text'
 default.pretrained = 'model/vgg16'
 default.pretrained_epoch = 0
-default.base_lr = 0.001
+default.base_lr = 0.004
 # default dataset
 default.dataset = 'OCRDB'
 default.image_set = 'train'

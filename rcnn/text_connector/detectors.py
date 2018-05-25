@@ -5,17 +5,19 @@ from .text_proposal_connector import TextProposalConnector
 from .text_proposal_connector_oriented import TextProposalConnector as TextProposalConnectorOriented
 from .text_connect_cfg import Config as TextLineCfg
 
+import mxnet as mx
+
 CONF_THRESH = 0.7
 NMS_THRESH = 0.3
 
 nms = py_nms_wrapper(NMS_THRESH)
 
 class TextDetector:
-    def __init__(self):
-        # if self.mode == "H":
-        self.text_proposal_connector=TextProposalConnector()
-        # elif self.mode == "O":
-        #     self.text_proposal_connector=TextProposalConnectorOriented()
+    def __init__(self, mode= "H"):
+        if mode == "H":
+            self.text_proposal_connector=TextProposalConnector()
+        elif mode == "O":
+            self.text_proposal_connector=TextProposalConnectorOriented()
 
         
     def detect(self, text_proposals, scores,size):

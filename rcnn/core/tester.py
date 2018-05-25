@@ -128,10 +128,10 @@ def im_rpn_detect(predictor, data_batch, data_names, scale):
     output = predictor.predict(data_batch)
     print(output.keys())
     data_dict = dict(zip(data_names, data_batch.data))
-    if config.TEST.HAS_RPN:
-        rois = output['rois_output'].asnumpy()[:, 1:]
-    else:
-        rois = data_dict['rois'].asnumpy().reshape((-1, 5))[:, 1:]
+    #if config.TEST.HAS_RPN:
+    rois = output['rois_output'].asnumpy()[:, 1:]
+    #else:
+    #    rois = data_dict['rois'].asnumpy().reshape((-1, 5))[:, 1:]
     im_shape = data_dict['data'].shape
 
     # save output
