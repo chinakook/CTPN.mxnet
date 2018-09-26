@@ -56,7 +56,7 @@ def parse_args():
     parser.add_argument('--frequent', help='frequency of logging', default=default.frequent, type=int)
     parser.add_argument('--kvstore', help='the kv-store type', default=default.kvstore, type=str)
     parser.add_argument('--work_load_list', help='work load for different devices', default=None, type=list)
-    parser.add_argument('--no_flip', help='disable flip images', action='store_true', default=True)
+    parser.add_argument('--no_flip', help='disable flip images', action='store_true')
     parser.add_argument('--no_shuffle', help='disable random shuffle', action='store_true')
     parser.add_argument('--resume', help='continue training', action='store_true')
     # alternate

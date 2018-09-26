@@ -52,7 +52,7 @@ config.TRAIN.BATCH_ROIS = 128
 config.TRAIN.FG_FRACTION = 0.25
 config.TRAIN.FG_THRESH = 0.5
 config.TRAIN.BG_THRESH_HI = 0.5
-config.TRAIN.BG_THRESH_LO = 0.0
+config.TRAIN.BG_THRESH_LO = 0.1
 # rcnn bounding box regression params
 config.TRAIN.BBOX_REGRESSION_THRESH = 0.5
 config.TRAIN.BBOX_WEIGHTS = np.array([1.0, 1.0, 1.0, 1.0])

@@ -134,7 +134,7 @@ class ProposalOperator(mx.operator.CustomOp):
         # TODO: may keep none
         keep = self._filter_boxes(proposals, min_size* im_info[2]) # fix here
         proposals = proposals[keep, :]
-        logger.debug("det:\n %d, %f, %s\n%s" % (min_size, im_info[2], proposals, keep))
+        # logger.debug("det:\n %d, %f, %s\n%s" % (min_size, im_info[2], proposals, keep))
         scores = scores[keep]
         
         # 4. sort all (proposal, score) pairs by score from highest to lowest
