@@ -132,12 +132,10 @@ class ProposalOperator(mx.operator.CustomOp):
         # 3. remove predicted boxes with either height or width < threshold
         # (NOTE: convert min_size to input image scale stored in im_info[2])
         # TODO: may keep none
-        logger.info('%d, %f' % (min_size, im_info[2]))
-        keep = self._filter_boxes(proposals, 0* im_info[2]) # fix here
-        logger.info(keep)
-        proposals = proposals[keep, :]
+        #keep = self._filter_boxes(proposals, min_size * im_info[2]) # fix here
+        #proposals = proposals[keep, :]
         # logger.debug("det:\n %d, %f, %s\n%s" % (min_size, im_info[2], proposals, keep))
-        scores = scores[keep]
+        #scores = scores[keep]
         
         # 4. sort all (proposal, score) pairs by score from highest to lowest
         # 5. take top pre_nms_topN (e.g. 6000)

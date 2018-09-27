@@ -97,11 +97,11 @@ def demo_net(predictor, detector, image_name):
                                 edgecolor=color, linewidth=1.0)
         #plt.gca().add_patch(rect)        
         cv2.rectangle(im, (int(x0), int(y0)), (int(x1), int(y1)),
-            (0,0,255), 2)
-    im = cv2.resize(im, (0,0), fx=0.5, fy=0.5)
-    #cv2.imwrite('results/demo.jpg', im)
-    cv2.imshow("w", im)
-    cv2.waitKey()
+            (0,0,255), 1)
+    #im = cv2.resize(im, (0,0), fx=0.5, fy=0.5)
+    cv2.imwrite('results/demo10.jpg', im)
+    #cv2.imshow("w", im)
+    #cv2.waitKey()
     #plt.show()
 
 def parse_args():

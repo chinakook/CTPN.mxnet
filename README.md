@@ -24,6 +24,16 @@ Use demo_ctpn.py to test.
 ## Our results
 `NOTICE:` all the photos used below are collected from the internet. If it affects you, please contact me to delete them.
 <img src="/results/demo.jpg" width=320 height=240 />
+<img src="/results/demo2.jpg" width=320 height=240 />
+<img src="/results/demo3.jpg" width=320 height=240 />
+<img src="/results/demo4.jpg" width=320 height=240 />
+<img src="/results/demo5.jpg" width=320 height=240 />
+<img src="/results/demo6.jpg" />
+<img src="/results/demo7.jpg"  />
+<img src="/results/demo8.jpg"  />
+<img src="/results/demo9.jpg"  />
+<img src="/results/demo10.jpg" />
+
 
 ## References
 1. https://github.com/tianzhi0549/CTPN
