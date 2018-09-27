@@ -131,7 +131,7 @@ def main():
     flist = [path + '/' + fn for fn in os.listdir(path)]
     for fn in flist:
         pass
-    demo_net(predictor, detector, '/mnt/15F1B72E1A7798FD/DK2/mop/png/Pic_2018_09_12_100837_blockId#5984.png')
+    demo_net(predictor, detector, '/mnt/15F1B72E1A7798FD/DK2/mop/data/010.png')
 
 
 if __name__ == '__main__':

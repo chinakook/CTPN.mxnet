@@ -103,7 +103,7 @@ def get_vgg_text_rpn(data, label, bbox_target, bbox_weight, num_anchors=10):
         rnn.LSTMCell(128, prefix="l_"),
         rnn.LSTMCell(128, prefix='r_')
     )
-
+    #mx.symbol.RNN
     rpn_conv_t = mx.symbol.transpose(rpn_conv, axes=(0, 2, 3, 1))
     rpn_conv_t = mx.symbol.reshape(rpn_conv_t, shape=(-3, -2))
 

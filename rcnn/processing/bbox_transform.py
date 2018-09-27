@@ -132,6 +132,44 @@ def nonlinear_pred(boxes, box_deltas):
 
     return pred_boxes
 
+def nonlinear_pred_ctpn(boxes, box_deltas):
+    """
+    Transform the set of class-agnostic boxes into class-specific boxes
+    by applying the predicted offsets (box_deltas)
+    :param boxes: !important [N 4]
+    :param box_deltas: [N, 4 * num_classes]
+    :return: [N 4 * num_classes]
+    """
+    if boxes.shape[0] == 0:
+        return np.zeros((0, box_deltas.shape[1]))
+
+    boxes = boxes.astype(np.float, copy=False)
+    widths = boxes[:, 2] - boxes[:, 0] + 1.0
+    heights = boxes[:, 3] - boxes[:, 1] + 1.0
+    ctr_x = boxes[:, 0] + 0.5 * (widths - 1.0)
+    ctr_y = boxes[:, 1] + 0.5 * (heights - 1.0)
+
+    dx = box_deltas[:, 0::4]
+    dy = box_deltas[:, 1::4]
+    dw = box_deltas[:, 2::4]
+    dh = box_deltas[:, 3::4]
+
+    pred_ctr_x = ctr_x[:, np.newaxis]
+    pred_ctr_y = dy * heights[:, np.newaxis] + ctr_y[:, np.newaxis]
+    pred_w = widths[:, np.newaxis]
+    pred_h = np.exp(dh) * heights[:, np.newaxis]
+
+    pred_boxes = np.zeros(box_deltas.shape)
+    # x1
+    pred_boxes[:, 0::4] = pred_ctr_x - 0.5 * (pred_w - 1.0)
+    # y1
+    pred_boxes[:, 1::4] = pred_ctr_y - 0.5 * (pred_h - 1.0)
+    # x2
+    pred_boxes[:, 2::4] = pred_ctr_x + 0.5 * (pred_w - 1.0)
+    # y2
+    pred_boxes[:, 3::4] = pred_ctr_y + 0.5 * (pred_h - 1.0)
+
+    return pred_boxes
 
 def iou_transform(ex_rois, gt_rois):
     """ return bbox targets, IoU loss uses gt_rois as gt """
@@ -177,3 +215,4 @@ def iou_pred(boxes, box_deltas):
 # define bbox_transform and bbox_pred
 bbox_transform = nonlinear_transform
 bbox_pred = nonlinear_pred
+bbox_pred_ctpn = nonlinear_pred_ctpn

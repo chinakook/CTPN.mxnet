@@ -30,8 +30,7 @@ from rcnn.utils.combine_model import combine_model
 
 
 def alternate_train(args, ctx, pretrained, epoch,
-                    rpn_epoch, rpn_lr, rpn_lr_step,
-                    rcnn_epoch, rcnn_lr, rcnn_lr_step):
+                    rpn_epoch, rpn_lr, rpn_lr_step):
     # basic config
     begin_epoch = 0
     config.TRAIN.BG_THRESH_LO = 0.0
@@ -66,9 +65,6 @@ def parse_args():
     parser.add_argument('--rpn_epoch', help='end epoch of rpn training', default=default.rpn_epoch, type=int)
     parser.add_argument('--rpn_lr', help='base learning rate', default=default.rpn_lr, type=float)
     parser.add_argument('--rpn_lr_step', help='learning rate steps (in epoch)', default=default.rpn_lr_step, type=str)
-    parser.add_argument('--rcnn_epoch', help='end epoch of rcnn training', default=default.rcnn_epoch, type=int)
-    parser.add_argument('--rcnn_lr', help='base learning rate', default=default.rcnn_lr, type=float)
-    parser.add_argument('--rcnn_lr_step', help='learning rate steps (in epoch)', default=default.rcnn_lr_step, type=str)
     args = parser.parse_args()
     return args
 
@@ -78,8 +74,7 @@ def main():
     logger.info('Called with argument: %s' % args)
     ctx = [mx.gpu(int(i)) for i in args.gpus.split(',')]
     alternate_train(args, ctx, args.pretrained, args.pretrained_epoch,
-                    args.rpn_epoch, args.rpn_lr, args.rpn_lr_step,
-                    args.rcnn_epoch, args.rcnn_lr, args.rcnn_lr_step)
+                    args.rpn_epoch, args.rpn_lr, args.rpn_lr_step)
 
 if __name__ == '__main__':
     main()

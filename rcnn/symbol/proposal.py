@@ -26,7 +26,7 @@ import numpy.random as npr
 from distutils.util import strtobool
 
 from rcnn.logger import logger
-from rcnn.processing.bbox_transform import bbox_pred, clip_boxes
+from rcnn.processing.bbox_transform import bbox_pred_ctpn, clip_boxes
 from rcnn.processing.generate_anchor import generate_anchors
 from rcnn.processing.text_anchor import text_anchors
 
@@ -124,7 +124,7 @@ class ProposalOperator(mx.operator.CustomOp):
         scores = self._clip_pad(scores, (height, width))
         scores = scores.transpose((0, 2, 3, 1)).reshape((-1, 1))
         # Convert anchors into proposals via bbox transformations
-        proposals = bbox_pred(anchors, bbox_deltas)
+        proposals = bbox_pred_ctpn(anchors, bbox_deltas)
 
         # 2. clip predicted boxes to image
         proposals = clip_boxes(proposals, im_info[:2])
@@ -132,7 +132,9 @@ class ProposalOperator(mx.operator.CustomOp):
         # 3. remove predicted boxes with either height or width < threshold
         # (NOTE: convert min_size to input image scale stored in im_info[2])
         # TODO: may keep none
-        keep = self._filter_boxes(proposals, min_size* im_info[2]) # fix here
+        logger.info('%d, %f' % (min_size, im_info[2]))
+        keep = self._filter_boxes(proposals, 0* im_info[2]) # fix here
+        logger.info(keep)
         proposals = proposals[keep, :]
         # logger.debug("det:\n %d, %f, %s\n%s" % (min_size, im_info[2], proposals, keep))
         scores = scores[keep]
