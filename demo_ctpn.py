@@ -99,10 +99,8 @@ def demo_net(predictor, detector, image_name):
         cv2.rectangle(im, (int(x0), int(y0)), (int(x1), int(y1)),
             (0,0,255), 1)
     #im = cv2.resize(im, (0,0), fx=0.5, fy=0.5)
-    cv2.imwrite('results/demo10.jpg', im)
-    #cv2.imshow("w", im)
-    #cv2.waitKey()
-    #plt.show()
+    cv2.imshow("w", im)
+    cv2.waitKey()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Demonstrate a Faster R-CNN network')
@@ -126,15 +124,12 @@ def main():
 
     detector = TextDetector()
     
-    #path = '/home/dingkou/dev/text-detection-ctpn/data/demo'
-    path = '/mnt/6B133E147DED759E/VOCdevkit/VOC2007/train/JPEGImages'
-    flist = [path + '/' + fn for fn in os.listdir(path)]
-    for fn in flist:
-        pass
-    demo_net(predictor, detector, '/mnt/15F1B72E1A7798FD/DK2/mop/data/010.png')
+    # path = '/mnt/6B133E147DED759E/VOCdevkit/VOC2007/train/JPEGImages'
+    # flist = [path + '/' + fn for fn in os.listdir(path)]
+    # for fn in flist:
+    #     pass
+    demo_net(predictor, detector, args.image)
 
 
 if __name__ == '__main__':
     main()
-
-    # python demo_ctpn.py --image "/mnt/15F1B72E1A7798FD/DK2/ctpn_tiny/val/JPEGImages/img_1765.jpg" --prefix model/rpn1 --epoch 8 --vis

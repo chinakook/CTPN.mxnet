@@ -25,14 +25,14 @@ class OCRDB(IMDB):
         self.image_set = image_set
         self.root_path = root_path
         self.devkit_path = devkit_path
-        self.data_path =  os.path.join(devkit_path,image_set)
-        #CHANGED sign--> plate
+        self.data_path =  devkit_path
+        print(self.data_path)
         self.classes = ['__background__',  # always index 0
                         'text']
         self.num_classes = len(self.classes)
         self.image_set_index = self.load_image_set_index()
         self.num_images = len(self.image_set_index)
-        print 'num_images', self.num_images
+        print ('num_images', self.num_images)
         self.mask_size = mask_size
         self.binary_thresh = binary_thresh
 
@@ -45,7 +45,7 @@ class OCRDB(IMDB):
         find out which indexes correspond to given image set (train or val)
         :return:
         """
-        image_set_index_file = os.path.join(self.data_path,  'Main', self.image_set + '.txt')
+        image_set_index_file = os.path.join(self.data_path, 'ImageSets', 'Main', self.image_set + '.txt')
         assert os.path.exists(image_set_index_file), 'Path does not exist: {}'.format(image_set_index_file)
         with open(image_set_index_file) as f:
             image_set_index = [x.strip() for x in f.readlines()]

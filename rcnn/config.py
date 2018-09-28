@@ -29,7 +29,7 @@ config.FIXED_PARAMS = ['conv1', 'conv2']
 config.FIXED_PARAMS_SHARED = ['conv1', 'conv2', 'conv3', 'conv4', 'conv5']
 
 # dataset related params
-config.NUM_CLASSES = 21
+config.NUM_CLASSES = 2
 config.SCALES = [(600, 1000)]  # first is scale (the shorter side); second is max size
 config.ANCHOR_SCALES = (8, 16, 32)
 config.ANCHOR_RATIOS = (0.5, 1, 2)
@@ -117,8 +117,8 @@ default.base_lr = 0.004
 default.dataset = 'OCRDB'
 default.image_set = 'train'
 default.test_image_set = 'val'
-default.root_path = '/mnt/6B133E147DED759E/VOCdevkit/VOC2007'
-default.dataset_path = '/mnt/6B133E147DED759E/VOCdevkit/VOC2007'
+default.root_path = '/home/kk/data/VOCdevkit/VOC2007'
+default.dataset_path = '/home/kk/data/VOCdevkit/VOC2007'
 # default training
 default.frequent = 20
 default.kvstore = 'device'

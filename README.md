@@ -4,34 +4,28 @@
 A MXNet CTPN implementation mimic of eragonruan's [tensorflow implementation](https://github.com/eragonruan/text-detection-ctpn) with full feature. We use eragonruan's dataset for training and get nearly the same detection results as his.
 
 ## Training
-1. Download data prepared by eragonruan from [google drive](https://drive.google.com/open?id=0B_WmJoEtfGhDRl82b1dJTjB2ZGc) or [baidu yun](https://pan.baidu.com/s/1kUNTl1l).
-2. Unzip the dataset downloaded to 'VOCdevkit' folder, then move some folders and make the tree as following:
-  VOCdevkit
-     |
-     |-VOC2007
-        |- train
-            |- Annotations
-            |- JPEGImages
-            |- Main (Moved from ImageSets folder)
-                |- train.txt
-3. Remove img_2346, img_2347, img_2348 and img_2349 from train.txt as these files dose not exist.
-4. Change the Line 120 and 121 of config.py to the dataset folder.
-5. run 'python train_ctpn.py'
+1. Build the cython modules as following:
+```
+cd rcnn/cython
+python setup.py build_ext --inplace
+cd ../pycocotools/
+python setup.py build_ext --inplace
+```
+2. Download data prepared by eragonruan from [google drive](https://drive.google.com/open?id=0B_WmJoEtfGhDRl82b1dJTjB2ZGc) or [baidu yun](https://pan.baidu.com/s/1kUNTl1l). This dataset is already prepared by @eragonruan to fit CTPN.
+3. Unzip the dataset downloaded to 'VOCdevkit' folder, and set both 'default.root_path' and 'default.dataset_path' in rcnn/config.py to '&lt;somewhere&gt;/VOCdevkit/VOC2007'. You can also change other hyperparams in config.py.
+4. Run 'python train_ctpn.py' to train. Run 'python train_ctpn.py --gpus '0' --rpn_lr 0.01 --no_flip 0' to train model on gpu 0 with learning rate 0.01 and with flip data augmentation.
 
 ## Testing
-Use demo_ctpn.py to test.
+Use 'python demo_ctpn.py --image "&lt;your_image_path&gt;" --prefix model/rpn1 --epoch 8' to test.
 
 ## Our results
 `NOTICE:` all the photos used below are collected from the internet. If it affects you, please contact me to delete them.
-<img src="/results/demo.jpg" width=320 height=240 />
-<img src="/results/demo2.jpg" width=320 height=240 />
-<img src="/results/demo3.jpg" width=320 height=240 />
-<img src="/results/demo4.jpg" width=320 height=240 />
+<img src="/results/demo.jpg" width=320 height=240 /><img src="/results/demo2.jpg" width=320 height=240 />
+<img src="/results/demo3.jpg" width=320 height=240 /><img src="/results/demo4.jpg" width=320 height=240 />
 <img src="/results/demo5.jpg" width=320 height=240 />
-<img src="/results/demo6.jpg" />
-<img src="/results/demo7.jpg"  />
-<img src="/results/demo8.jpg"  />
-<img src="/results/demo9.jpg"  />
+<img src="/results/demo6.jpg" width=320 height=480 />
+<img src="/results/demo7.jpg" width=480 height=320/>
+<img src="/results/demo8.jpg" width=320 height=480/><img src="/results/demo9.jpg" width=320 height=480/>
 <img src="/results/demo10.jpg" />
 
 
