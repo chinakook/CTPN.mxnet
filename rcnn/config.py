@@ -117,8 +117,8 @@ default.base_lr = 0.004
 default.dataset = 'OCRDB'
 default.image_set = 'train'
 default.test_image_set = 'val'
-default.root_path = r'E:\im\ctpn_VOCdevkit\VOCdevkit\VOC2007'
-default.dataset_path = r'E:\im\ctpn_VOCdevkit\VOCdevkit\VOC2007'
+default.root_path = r'/home/kk/data/VOCdevkit/VOC2007'
+default.dataset_path = r'/home/kk/data/VOCdevkit/VOC2007'
 # default training
 default.frequent = 20
 default.kvstore = 'device'

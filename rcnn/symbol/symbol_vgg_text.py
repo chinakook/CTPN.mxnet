@@ -27,61 +27,95 @@ def get_vgg_text_conv(data):
     :param data: Symbol
     :return: Symbol
     """
+    WRKLIMIT = 2048
+
     # group 1
     conv1_1 = mx.symbol.Convolution(
-        data=data, kernel=(3, 3), pad=(1, 1), num_filter=64, workspace=2048, name="conv1_1")
+        data=data, kernel=(3, 3), pad=(1, 1), num_filter=64, workspace=WRKLIMIT, name="conv1_1")
     relu1_1 = mx.symbol.Activation(data=conv1_1, act_type="relu", name="relu1_1")
     conv1_2 = mx.symbol.Convolution(
-        data=relu1_1, kernel=(3, 3), pad=(1, 1), num_filter=64, workspace=2048, name="conv1_2")
+        data=relu1_1, kernel=(3, 3), pad=(1, 1), num_filter=64, workspace=WRKLIMIT, name="conv1_2")
     relu1_2 = mx.symbol.Activation(data=conv1_2, act_type="relu", name="relu1_2")
     pool1 = mx.symbol.Pooling(
         data=relu1_2, pool_type="max", kernel=(2, 2), stride=(2, 2), name="pool1")
     # group 2
     conv2_1 = mx.symbol.Convolution(
-        data=pool1, kernel=(3, 3), pad=(1, 1), num_filter=128, workspace=2048, name="conv2_1")
+        data=pool1, kernel=(3, 3), pad=(1, 1), num_filter=128, workspace=WRKLIMIT, name="conv2_1")
     relu2_1 = mx.symbol.Activation(data=conv2_1, act_type="relu", name="relu2_1")
     conv2_2 = mx.symbol.Convolution(
-        data=relu2_1, kernel=(3, 3), pad=(1, 1), num_filter=128, workspace=2048, name="conv2_2")
+        data=relu2_1, kernel=(3, 3), pad=(1, 1), num_filter=128, workspace=WRKLIMIT, name="conv2_2")
     relu2_2 = mx.symbol.Activation(data=conv2_2, act_type="relu", name="relu2_2")
     pool2 = mx.symbol.Pooling(
         data=relu2_2, pool_type="max", kernel=(2, 2), stride=(2, 2), name="pool2")
     # group 3
     conv3_1 = mx.symbol.Convolution(
-        data=pool2, kernel=(3, 3), pad=(1, 1), num_filter=256, workspace=2048, name="conv3_1")
+        data=pool2, kernel=(3, 3), pad=(1, 1), num_filter=256, workspace=WRKLIMIT, name="conv3_1")
     relu3_1 = mx.symbol.Activation(data=conv3_1, act_type="relu", name="relu3_1")
     conv3_2 = mx.symbol.Convolution(
-        data=relu3_1, kernel=(3, 3), pad=(1, 1), num_filter=256, workspace=2048, name="conv3_2")
+        data=relu3_1, kernel=(3, 3), pad=(1, 1), num_filter=256, workspace=WRKLIMIT, name="conv3_2")
     relu3_2 = mx.symbol.Activation(data=conv3_2, act_type="relu", name="relu3_2")
     conv3_3 = mx.symbol.Convolution(
-        data=relu3_2, kernel=(3, 3), pad=(1, 1), num_filter=256, workspace=2048, name="conv3_3")
+        data=relu3_2, kernel=(3, 3), pad=(1, 1), num_filter=256, workspace=WRKLIMIT, name="conv3_3")
     relu3_3 = mx.symbol.Activation(data=conv3_3, act_type="relu", name="relu3_3")
     pool3 = mx.symbol.Pooling(
         data=relu3_3, pool_type="max", kernel=(2, 2), stride=(2, 2), name="pool3")
     # group 4
     conv4_1 = mx.symbol.Convolution(
-        data=pool3, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=2048, name="conv4_1")
+        data=pool3, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=WRKLIMIT, name="conv4_1")
     relu4_1 = mx.symbol.Activation(data=conv4_1, act_type="relu", name="relu4_1")
     conv4_2 = mx.symbol.Convolution(
-        data=relu4_1, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=2048, name="conv4_2")
+        data=relu4_1, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=WRKLIMIT, name="conv4_2")
     relu4_2 = mx.symbol.Activation(data=conv4_2, act_type="relu", name="relu4_2")
     conv4_3 = mx.symbol.Convolution(
-        data=relu4_2, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=2048, name="conv4_3")
+        data=relu4_2, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=WRKLIMIT, name="conv4_3")
     relu4_3 = mx.symbol.Activation(data=conv4_3, act_type="relu", name="relu4_3")
     pool4 = mx.symbol.Pooling(
         data=relu4_3, pool_type="max", kernel=(2, 2), stride=(2, 2), name="pool4")
     # group 5
     conv5_1 = mx.symbol.Convolution(
-        data=pool4, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=2048, name="conv5_1")
+        data=pool4, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=WRKLIMIT, name="conv5_1")
     relu5_1 = mx.symbol.Activation(data=conv5_1, act_type="relu", name="relu5_1")
     conv5_2 = mx.symbol.Convolution(
-        data=relu5_1, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=2048, name="conv5_2")
+        data=relu5_1, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=WRKLIMIT, name="conv5_2")
     relu5_2 = mx.symbol.Activation(data=conv5_2, act_type="relu", name="relu5_2")
     conv5_3 = mx.symbol.Convolution(
-        data=relu5_2, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=2048, name="conv5_3")
+        data=relu5_2, kernel=(3, 3), pad=(1, 1), num_filter=512, workspace=WRKLIMIT, name="conv5_3")
     relu5_3 = mx.symbol.Activation(data=conv5_3, act_type="relu", name="relu5_3")
 
     return relu5_3
 
+def get_vgg_ctpn_head(data):
+    # relu5_3 = get_vgg_text_conv(data)
+    # _,relu_shape,_ = relu5_3.infer_shape_partial()
+    # shape = relu_shape[0]
+    # bilstm = rnn.BidirectionalCell(
+    #     rnn.LSTMCell(128, prefix="l_"),
+    #     rnn.LSTMCell(128, prefix='r_')
+    # )
+    
+    # RPN
+    rpn_conv = mx.symbol.Convolution(
+        data=relu5_3, kernel=(3, 3), pad=(1, 1), num_filter=512, name="rpn_conv_3x3")
+
+
+
+
+    rpn_conv_t0 = mx.symbol.transpose(rpn_conv, axes=(0, 2, 3, 1))
+    rpn_conv_t = mx.symbol.reshape(rpn_conv_t0, shape=(-3, -2))
+
+    bilstm_params = mx.sym.Variable('bilstm_params')
+    bilstm_state = mx.sym.Variable('bilstm_state')
+    begin_state = mx.sym.Variable('bilstm_begin_state')
+    lstm_o = mx.symbol.RNN(rpn_conv_t, parameters=bilstm_params, state=bilstm_state, state_cell=begin_state,
+                state_size=128, num_layers=1, bidirectional=True, mode='lstm', p=0.5,
+                state_outputs=False, name='bilstm')
+
+    #lstm_o, _ = bilstm.unroll(shape[3], rpn_conv_t, layout='NTC', merge_outputs=True)
+    pred = mx.sym.FullyConnected(data=lstm_o, num_hidden=512, flatten=False, name='lstm_proj')
+    pred = mx.sym.reshape_like(pred, rpn_conv_t0)
+    pred = mx.symbol.transpose(pred, axes=(0, 3, 1, 2))
+    rpn_relu = mx.symbol.Activation(data=pred, act_type="relu", name="rpn_relu")
+    return rpn_relu
 
 def get_vgg_text_rpn(data, label, bbox_target, bbox_weight, num_anchors=10):
     """
@@ -90,29 +124,7 @@ def get_vgg_text_rpn(data, label, bbox_target, bbox_weight, num_anchors=10):
     :return: Symbol
     """
 
-    # shared convolutional layers
-    relu5_3 = get_vgg_text_conv(data)
-    _,relu_shape,_ = relu5_3.infer_shape_partial()
-    shape = relu_shape[0]
-
-    # RPN
-    rpn_conv = mx.symbol.Convolution(
-        data=relu5_3, kernel=(3, 3), pad=(1, 1), num_filter=512, name="rpn_conv_3x3")
-
-    bilstm = rnn.BidirectionalCell(
-        rnn.LSTMCell(128, prefix="l_"),
-        rnn.LSTMCell(128, prefix='r_')
-    )
-    #mx.symbol.RNN
-    rpn_conv_t = mx.symbol.transpose(rpn_conv, axes=(0, 2, 3, 1))
-    rpn_conv_t = mx.symbol.reshape(rpn_conv_t, shape=(-3, -2))
-
-    lstm_o, _ = bilstm.unroll(shape[0] * shape[3], rpn_conv_t, layout='NTC', merge_outputs=True)
-    pred = mx.sym.FullyConnected(data=lstm_o, num_hidden=512, flatten=False, name='lstm_proj')
-    pred = mx.sym.reshape(pred, shape=(shape[0], shape[2], shape[3], 512))
-    pred = mx.symbol.transpose(pred, axes=(0, 3, 1, 2))
-
-    rpn_relu = mx.symbol.Activation(data=pred, act_type="relu", name="rpn_relu")
+    rpn_relu = get_vgg_ctpn_head(data)
     rpn_cls_score = mx.symbol.Convolution(
         data=rpn_relu, kernel=(1, 1), pad=(0, 0), num_filter=2 * num_anchors, name="rpn_cls_score")
     rpn_bbox_pred = mx.symbol.Convolution(
@@ -140,29 +152,7 @@ def get_vgg_text_rpn_test(data, im_info, num_anchors=10):
     :return: Symbol
     """
 
-    # shared convolutional layers
-    relu5_3 = get_vgg_text_conv(data)
-    _,relu_shape,_ = relu5_3.infer_shape_partial()
-    shape = relu_shape[0]
-
-    # RPN
-    rpn_conv = mx.symbol.Convolution(
-        data=relu5_3, kernel=(3, 3), pad=(1, 1), num_filter=512, name="rpn_conv_3x3")
-
-    bilstm = rnn.BidirectionalCell(
-        rnn.LSTMCell(128, prefix="l_"),
-        rnn.LSTMCell(128, prefix='r_')
-    )
-
-    rpn_conv_t = mx.symbol.transpose(rpn_conv, axes=(0, 2, 3, 1))
-    rpn_conv_t = mx.symbol.reshape(rpn_conv_t, shape=(-3, -2))
-
-    lstm_o, _ = bilstm.unroll(shape[0] * shape[3], rpn_conv_t, layout='NTC', merge_outputs=True)
-    pred = mx.sym.FullyConnected(data=lstm_o, num_hidden=512, flatten=False, name='lstm_proj')
-    pred = mx.sym.reshape(pred, shape=(shape[0], shape[2], shape[3], 512))
-    pred = mx.symbol.transpose(pred, axes=(0, 3, 1, 2))
-
-    rpn_relu = mx.symbol.Activation(data=pred, act_type="relu", name="rpn_relu")
+    rpn_relu = get_vgg_ctpn_head(data)
     rpn_cls_score = mx.symbol.Convolution(
         data=rpn_relu, kernel=(1, 1), pad=(0, 0), num_filter=2 * num_anchors, name="rpn_cls_score")
     rpn_bbox_pred = mx.symbol.Convolution(
