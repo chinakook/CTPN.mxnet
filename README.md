@@ -6,16 +6,11 @@ CTPN is a nice scene text detection method.
 [**中文文档**](./README_CN.md)
 
 ## Training
-1. Build the cython modules as following:
-    ``` bash
-    cd rcnn/cython
-    python setup.py build_ext --inplace
-    cd ../pycocotools/
-    python setup.py build_ext --inplace
-    ```
-2. Download dataset from [google drive](https://drive.google.com/open?id=0B_WmJoEtfGhDRl82b1dJTjB2ZGc) or [baidu yun](https://pan.baidu.com/s/1kUNTl1l). This dataset is already prepared by **@eragonruan** to fit CTPN.
-3. Unzip the dataset downloaded to ```'VOCdevkit'``` folder, and set both ```default.root_path``` and ```default.dataset_path``` in ```rcnn/config.py``` to ```'<somewhere>/VOCdevkit/VOC2007'```. You can also change other hyperparams in ```rcnn/config.py```.
-4. Run ```python train_ctpn.py``` to train. Run ```python train_ctpn.py --gpus '0' --rpn_lr 0.01 --no_flip 0``` to train model on gpu 0 with learning rate 0.01 and with flip data augmentation.
+1. Execute script init.sh(init.bat on Windows) to initialize project.
+2. Download pretrained model from [here](http://data.mxnet.io/models/imagenet/vgg/vgg16-0000.params) into ```model``` folder.
+3. Download dataset from [google drive](https://drive.google.com/open?id=0B_WmJoEtfGhDRl82b1dJTjB2ZGc) or [baidu yun](https://pan.baidu.com/s/1kUNTl1l). This dataset is already prepared by **@eragonruan** to fit CTPN.
+4. Unzip the dataset downloaded to ```'VOCdevkit'``` folder, and set both ```default.root_path``` and ```default.dataset_path``` in ```rcnn/config.py``` to ```'<somewhere>/VOCdevkit/VOC2007'```. You can also change other hyperparams in ```rcnn/config.py```.
+5. Run ```python train_ctpn.py``` to train. Run ```python train_ctpn.py --gpus '0' --rpn_lr 0.01 --no_flip 0``` to train model on gpu 0 with learning rate 0.01 and with flip data augmentation.
 
 ## Testing
 Use ```python demo_ctpn.py --image "<your_image_path>" --prefix model/rpn1 --epoch 8``` to test.
@@ -39,5 +34,5 @@ Any NVIDIA GPUs with at least **2GB** memory should be OK.
 
 ## TODO
 - [ ] Custom dataset preparation tutorial
-- [ ] Windows support
+- [x] Windows support
 - [ ] Deploying network and c++ inference support
