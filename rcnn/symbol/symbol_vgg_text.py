@@ -16,10 +16,36 @@
 # under the License.
 
 import mxnet as mx
-from mxnet import rnn
+#from mxnet import rnn
 from rcnn.config import config
 from . import proposal
 from . import proposal_target
+
+from mxnet import gluon
+from mxnet.gluon import nn
+from mxnet.gluon import rnn
+from mxnet.gluon.model_zoo import vision
+
+class CTPNHead(gluon.HybridBlock):
+    def __init__(self):
+        super(CTPNHead, self).__init__()
+        backbone = vision.vgg16(pretrained=True, root='./model')
+        with self.name_scope():
+            self.detect_head = backbone.features[:30]
+            self.rpn_conv = nn.Conv2D(512, (3,3), strides=(1,1), padding=(1,1))
+            self.biRnn = rnn.LSTM(128, 1, 'NTC', dropout=0.5, bidirectional=True)
+            self.proj = nn.Dense(512, flatten=False)
+    def hybrid_forward(self, F, x, **kwargs):
+        x = self.detect_head(x)
+        x = self.rpn_conv(x)
+        x_t0 = F.transpose(x, axes=(0, 2, 3, 1))
+        x_t = F.reshape(x_t0, shape=(-3, -2))
+        lstm_o = self.biRnn(x_t)
+        pred = self.proj(lstm_o)
+        pred = F.reshape_like(pred, x_t0)
+        pred = F.transpose(pred, axes=(0, 3, 1, 2))
+        out = F.Activation(pred, act_type="relu")
+        return out
 
 def get_vgg_text_conv(data):
     """
@@ -85,37 +111,9 @@ def get_vgg_text_conv(data):
     return relu5_3
 
 def get_vgg_ctpn_head(data):
-    # relu5_3 = get_vgg_text_conv(data)
-    # _,relu_shape,_ = relu5_3.infer_shape_partial()
-    # shape = relu_shape[0]
-    # bilstm = rnn.BidirectionalCell(
-    #     rnn.LSTMCell(128, prefix="l_"),
-    #     rnn.LSTMCell(128, prefix='r_')
-    # )
-    
-    # RPN
-    rpn_conv = mx.symbol.Convolution(
-        data=relu5_3, kernel=(3, 3), pad=(1, 1), num_filter=512, name="rpn_conv_3x3")
+    net = CTPNHead()
 
-
-
-
-    rpn_conv_t0 = mx.symbol.transpose(rpn_conv, axes=(0, 2, 3, 1))
-    rpn_conv_t = mx.symbol.reshape(rpn_conv_t0, shape=(-3, -2))
-
-    bilstm_params = mx.sym.Variable('bilstm_params')
-    bilstm_state = mx.sym.Variable('bilstm_state')
-    begin_state = mx.sym.Variable('bilstm_begin_state')
-    lstm_o = mx.symbol.RNN(rpn_conv_t, parameters=bilstm_params, state=bilstm_state, state_cell=begin_state,
-                state_size=128, num_layers=1, bidirectional=True, mode='lstm', p=0.5,
-                state_outputs=False, name='bilstm')
-
-    #lstm_o, _ = bilstm.unroll(shape[3], rpn_conv_t, layout='NTC', merge_outputs=True)
-    pred = mx.sym.FullyConnected(data=lstm_o, num_hidden=512, flatten=False, name='lstm_proj')
-    pred = mx.sym.reshape_like(pred, rpn_conv_t0)
-    pred = mx.symbol.transpose(pred, axes=(0, 3, 1, 2))
-    rpn_relu = mx.symbol.Activation(data=pred, act_type="relu", name="rpn_relu")
-    return rpn_relu
+    return net(data)
 
 def get_vgg_text_rpn(data, label, bbox_target, bbox_weight, num_anchors=10):
     """
