@@ -84,23 +84,27 @@ def demo_net(predictor, detector, image_name):
     scores, boxes, data_dict = im_rpn_detect(predictor, data_batch, data_names, im_scale)
 
     textrois = detector.detect(boxes, scores, (im.shape[0], im.shape[1]))
-
     #plt.imshow(im[:,:,::-1])
     for bbox in textrois:
         x0, y0, x1, y1 = bbox[0], bbox[1], bbox[2], bbox[5]
         # color = (random.random(), random.random(), random.random())
         color = (0,1,0)
         
-        rect = plt.Rectangle((x0, y0),
-                                x1 - x0,
-                                y1 - y0, fill=False,
-                                edgecolor=color, linewidth=1.0)
-        #plt.gca().add_patch(rect)        
+        # rect = plt.Rectangle((x0, y0),
+        #                         x1 - x0,
+        #                         y1 - y0, fill=False,
+        #                         edgecolor=color, linewidth=1.0)
+        
+        # plt.gca().add_patch(rect)        
         cv2.rectangle(im, (int(x0), int(y0)), (int(x1), int(y1)),
-            (0,0,255), 1)
+            (0,0,255), 3)
     #im = cv2.resize(im, (0,0), fx=0.5, fy=0.5)
-    cv2.imshow("w", im)
-    cv2.waitKey()
+    #cv2.imshow("w", im)
+    #cv2.waitKey()
+    
+    cv2.imwrite(os.path.join('./results/mpres', os.path.basename(image_name)), im)
+    #plt.imshow(im[:,:,::-1])
+    #plt.waitforbuttonpress()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Demonstrate a Faster R-CNN network')
@@ -124,11 +128,12 @@ def main():
 
     detector = TextDetector()
     
-    # path = '/mnt/6B133E147DED759E/VOCdevkit/VOC2007/train/JPEGImages'
-    # flist = [path + '/' + fn for fn in os.listdir(path)]
-    # for fn in flist:
-    #     pass
-    demo_net(predictor, detector, args.image)
+    if os.path.isdir(args.image):
+        flist = [os.path.join(args.image, fn) for fn in os.listdir(args.image)]
+        for fn in flist:
+            demo_net(predictor, detector, fn)
+    else:
+        demo_net(predictor, detector, args.image)
 
 
 if __name__ == '__main__':
