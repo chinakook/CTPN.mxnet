@@ -46,7 +46,7 @@ def get_image(roidb):
         target_size = config.SCALES[scale_ind][0]
         max_size = config.SCALES[scale_ind][1]
         im, im_scale = resize(im, target_size, max_size, stride=config.IMAGE_STRIDE)
-        im_tensor = transform(im, config.PIXEL_MEANS)
+        im_tensor = transform(im, config.PIXEL_MEANS, config.PIXEL_STDS)
         processed_ims.append(im_tensor)
         im_info = [im_tensor.shape[2], im_tensor.shape[3], im_scale]
         new_rec['boxes'] = roi_rec['boxes'].copy() * im_scale
@@ -85,26 +85,32 @@ def resize(im, target_size, max_size, stride=0):
         return padded_im, im_scale
 
 
-def transform(im, pixel_means):
+def transform(im, pixel_means, std_values, norm=True):
     """
     transform into mxnet tensor,
     subtract pixel size and transform to correct format
     :param im: [height, width, channel] in BGR
     :param pixel_means: [B, G, R pixel means]
+    :param std_values: [B, G, R pixel stds]
+    :param norm: whether to divided pixels by 255
     :return: [batch, channel, height, width]
     """
     im_tensor = np.zeros((1, 3, im.shape[0], im.shape[1]))
     for i in range(3):
-        im_tensor[0, i, :, :] = im[:, :, 2 - i] - pixel_means[2 - i]
+        if norm:
+            im_tensor[0, i, :, :] = im[:, :, 2 - i] / 255.0
+        im_tensor[0, i, :, :] = (im_tensor[0, i, :, :] - pixel_means[2 - i]) / std_values[2 - i]
     return im_tensor
 
 
-def transform_inverse(im_tensor, pixel_means):
+def transform_inverse(im_tensor, pixel_means, std_values, norm=True):
     """
     transform from mxnet im_tensor to ordinary RGB image
     im_tensor is limited to one image
     :param im_tensor: [batch, channel, height, width]
     :param pixel_means: [B, G, R pixel means]
+    :param std_values: [B, G, R pixel stds]
+    :param norm: whether to divided pixels by 255
     :return: im [height, width, channel(RGB)]
     """
     assert im_tensor.shape[0] == 1
@@ -114,7 +120,10 @@ def transform_inverse(im_tensor, pixel_means):
     im_tensor = im_tensor.transpose(channel_swap)
     im = im_tensor[0]
     assert im.shape[2] == 3
+    im *= std_values[[2, 1, 0]]
     im += pixel_means[[2, 1, 0]]
+    if norm:
+        im *= 255
     im = im.astype(np.uint8)
     return im
 

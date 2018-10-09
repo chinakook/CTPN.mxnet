@@ -21,16 +21,19 @@ from easydict import EasyDict as edict
 config = edict()
 
 # network related params
-config.PIXEL_MEANS = np.array([103.939, 116.779, 123.68])
+# config.PIXEL_MEANS = np.array([103.939, 116.779, 123.68]) # BGR order
+# config.PIXEL_STDS = np.array([1.0,1.0,1.0]) # BGR order
+config.PIXEL_MEANS = np.array([0.406, 0.456, 0.485]) # BGR order
+config.PIXEL_STDS = np.array([0.225, 0.224, 0.229]) # BGR order
 config.IMAGE_STRIDE = 0
 config.RPN_FEAT_STRIDE = 16
 config.RCNN_FEAT_STRIDE = 16
-config.FIXED_PARAMS = ['conv1', 'conv2']
-config.FIXED_PARAMS_SHARED = ['conv1', 'conv2', 'conv3', 'conv4', 'conv5']
+config.FIXED_PARAMS = [] #['vgg0_conv0', 'vgg0_conv1', 'vgg0_conv2', 'vgg0_conv3']
+config.FIXED_PARAMS_SHARED = ['vgg0_conv']
 
 # dataset related params
 config.NUM_CLASSES = 2
-config.SCALES = [(600, 1000)]  # first is scale (the shorter side); second is max size
+config.SCALES = [(1000, 1600)]  # first is scale (the shorter side); second is max size
 config.ANCHOR_SCALES = (8, 16, 32)
 config.ANCHOR_RATIOS = (0.5, 1, 2)
 config.NUM_ANCHORS = 10 #len(config.ANCHOR_SCALES) * len(config.ANCHOR_RATIOS)
@@ -110,15 +113,15 @@ default = edict()
 
 # default network
 default.network = 'vgg_text'
-default.pretrained = 'model/vgg16'
+default.pretrained = 'model/vgggluon'
 default.pretrained_epoch = 0
 default.base_lr = 0.004
 # default dataset
 default.dataset = 'OCRDB'
 default.image_set = 'train'
 default.test_image_set = 'val'
-default.root_path = r'/mnt/15F1B72E1A7798FD/DK2/VOCdevkit/VOC2007'
-default.dataset_path = r'/mnt/15F1B72E1A7798FD/DK2/VOCdevkit/VOC2007'
+default.root_path = r'/mnt/15F1B72E1A7798FD/DK2/mpout'
+default.dataset_path = r'/mnt/15F1B72E1A7798FD/DK2/mpout'
 # default training
 default.frequent = 20
 default.kvstore = 'device'
