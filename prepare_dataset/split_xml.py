@@ -116,8 +116,6 @@ def build_voc_dirs(outdir):
     mkdir(os.path.join(outdir, 'ImageSets', 'Main'))
     mkdir(os.path.join(outdir, 'ImageSets', 'Segmentation'))
     mkdir(os.path.join(outdir, 'JPEGImages'))
-    # mkdir(os.path.join(outdir, 'SegmentationClass'))
-    # mkdir(os.path.join(outdir, 'SegmentationObject'))
     return os.path.join(outdir, 'Annotations'), os.path.join(outdir, 'JPEGImages'), os.path.join(outdir, 'ImageSets',
                                                                                                  'Main')
 
