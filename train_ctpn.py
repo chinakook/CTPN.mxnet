@@ -25,7 +25,6 @@ from rcnn.logger import logger
 from rcnn.config import config, default, generate_config
 from rcnn.tools.train_rpn import train_rpn
 from rcnn.tools.test_rpn import test_rpn
-from rcnn.tools.train_rcnn import train_rcnn
 from rcnn.utils.combine_model import combine_model
 
 

@@ -25,9 +25,8 @@ from ..symbol import *
 from ..symbol.gensym import gen_sym
 from ..core import callback, metric
 from ..core.loader import AnchorLoader
-from ..core.module import MutableModule
 from ..utils.load_data import load_gt_roidb, merge_roidb, filter_roidb
-from ..utils.load_model import load_param
+from ..utils.load_model import load_param, get_fixed_params
 
 
 def train_rpn(network, dataset, image_set, root_path, dataset_path,
@@ -70,9 +69,9 @@ def train_rpn(network, dataset, image_set, root_path, dataset_path,
     data_shape_dict = dict(train_data.provide_data + train_data.provide_label)
 
     # load symbol
-    sym = gen_sym(dict(max_data_shape + max_label_shape), len(ctx))
+    sym = gen_sym()
 
-    arg_shape, out_shape, aux_shape = sym.infer_shape_partial() #sym.infer_shape(**data_shape_dict)
+    arg_shape, out_shape, aux_shape = sym.infer_shape(**data_shape_dict)
     arg_shape_dict = dict(zip(sym.list_arguments(), arg_shape))
     out_shape_dict = dict(zip(sym.list_outputs(), out_shape))
     aux_shape_dict = dict(zip(sym.list_auxiliary_states(), aux_shape))
@@ -120,14 +119,13 @@ def train_rpn(network, dataset, image_set, root_path, dataset_path,
     data_names = [k[0] for k in train_data.provide_data]
     label_names = [k[0] for k in train_data.provide_label]
     if train_shared:
-        fixed_param_prefix = config.FIXED_PARAMS_SHARED
+        fixed_param_prefix = get_fixed_params(sym, config.FIXED_PARAMS_SHARED)
     else:
-        fixed_param_prefix = config.FIXED_PARAMS
-    mod = MutableModule(gen_sym, data_names=data_names, label_names=label_names,
+        fixed_param_prefix = get_fixed_params(sym, config.FIXED_PARAMS)
+    
+    mod = mx.module.Module(sym, data_names=data_names, label_names=label_names,
                         logger=logger, context=ctx, work_load_list=work_load_list,
-                        max_data_shapes=max_data_shape, max_label_shapes=max_label_shape,
-                        fixed_param_prefix=fixed_param_prefix)
-
+                        fixed_param_names=fixed_param_prefix)
     # decide training params
     # metric
     eval_metric = metric.RPNAccMetric()

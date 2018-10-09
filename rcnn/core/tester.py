@@ -25,7 +25,6 @@ import mxnet as mx
 import numpy as np
 from builtins import range
 
-from .module import MutableModule
 from rcnn.logger import logger
 from rcnn.config import config
 from rcnn.io import image
@@ -38,8 +37,8 @@ class Predictor(object):
                  context=mx.cpu(), max_data_shapes=None,
                  provide_data=None, provide_label=None,
                  arg_params=None, aux_params=None):
-        self._mod = MutableModule(gen_sym, data_names, label_names,
-                                  context=context, max_data_shapes=max_data_shapes)
+        self._mod = mx.module.Module(gen_sym, data_names, label_names,
+                                  context=context)
         self._mod.bind(provide_data, provide_label, for_training=False)
         self._mod.init_params(arg_params=arg_params, aux_params=aux_params)
 

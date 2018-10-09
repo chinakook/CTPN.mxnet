@@ -48,7 +48,7 @@ NMS_THRESH = 0.3
 def get_net(prefix, epoch, ctx):
     arg_params, aux_params = load_param(prefix, epoch, convert=True, ctx=ctx, process=True)
 
-    predictor = Predictor(gensym.gen_sym_infer, DATA_NAMES, LABEL_NAMES, context=ctx, max_data_shapes= dict(DATA_SHAPES),
+    predictor = Predictor(gensym.gen_sym_infer(), DATA_NAMES, LABEL_NAMES, context=ctx, max_data_shapes= dict(DATA_SHAPES),
                           provide_data=DATA_SHAPES, provide_label=LABEL_SHAPES,
                           arg_params=arg_params, aux_params=aux_params)
     return predictor

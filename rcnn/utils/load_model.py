@@ -74,3 +74,13 @@ def load_param(prefix, epoch, convert=False, ctx=None, process=False):
         for test in tests:
             arg_params[test.replace('_test', '')] = arg_params.pop(test)
     return arg_params, aux_params
+
+
+def get_fixed_params(symbol, fixed_param_prefix=''):
+    fixed_param_names = []
+    if fixed_param_prefix:
+        for name in symbol.list_arguments():
+            for prefix in fixed_param_prefix:
+                if prefix in name:
+                    fixed_param_names.append(name)
+    return fixed_param_names
