@@ -46,7 +46,8 @@ def write_xml(img_name, height, width, bboxes, extra=None):
             node_extra.text = extra[k]
     
     xml = tostring(node_root, pretty_print=True)
-    xml = str(xml, encoding='utf-8')
+    if not isinstance(xml, str):
+        xml = str(xml, encoding='utf-8')
     with open(img_name[:-3]+'xml','w') as f: ## Write document to file
         f.write(xml)
 
@@ -120,11 +121,11 @@ def build_voc_dirs(outdir):
                                                                                                  'Main')
 
 if __name__ == '__main__':
-    in_path = r'/home/kk/data/mp'
+    in_path = r'/mnt/15F1B72E1A7798FD/DK2/mp'
     
     xmllist = [os.path.join(in_path, _) for _ in os.listdir(in_path) if _.endswith('.xml')]
 
-    out_path = r'/home/kk/data/mpout'
+    out_path = r'/mnt/15F1B72E1A7798FD/DK2/mpout'
 
     out_xml_path, out_img_path, out_main_path = build_voc_dirs(out_path)
 
