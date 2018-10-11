@@ -91,13 +91,13 @@ def train_rpn(network, dataset, image_set, root_path, dataset_path,
         arg_params['rpn_bbox_pred_bias'] = mx.nd.zeros(shape=arg_shape_dict['rpn_bbox_pred_bias'])
 
         arg_params['ctpn0_lstm0_l0_i2h_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_l0_i2h_weight'])
-        arg_params['ctpn0_lstm0_l0_i2h_bias'] = mx.nd.ones(shape=arg_shape_dict['ctpn0_lstm0_l0_i2h_bias'])
+        arg_params['ctpn0_lstm0_l0_i2h_bias'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_l0_i2h_bias'])
         arg_params['ctpn0_lstm0_l0_h2h_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_l0_h2h_weight'])
-        arg_params['ctpn0_lstm0_l0_h2h_bias'] = mx.nd.zeros(shape=arg_shape_dict['ctpn0_lstm0_l0_h2h_bias'])
+        arg_params['ctpn0_lstm0_l0_h2h_bias'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_l0_h2h_bias'])
         arg_params['ctpn0_lstm0_r0_i2h_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_r0_i2h_weight'])
-        arg_params['ctpn0_lstm0_r0_i2h_bias'] = mx.nd.ones(shape=arg_shape_dict['ctpn0_lstm0_r0_i2h_bias'])
+        arg_params['ctpn0_lstm0_r0_i2h_bias'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_r0_i2h_bias'])
         arg_params['ctpn0_lstm0_r0_h2h_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_r0_h2h_weight'])
-        arg_params['ctpn0_lstm0_r0_h2h_bias'] = mx.nd.zeros(shape=arg_shape_dict['ctpn0_lstm0_r0_h2h_bias'])
+        arg_params['ctpn0_lstm0_r0_h2h_bias'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_lstm0_r0_h2h_bias'])
 
         arg_params['ctpn0_dense0_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_dense0_weight'])
         arg_params['ctpn0_dense0_bias'] = mx.nd.zeros(shape=arg_shape_dict['ctpn0_dense0_bias'])

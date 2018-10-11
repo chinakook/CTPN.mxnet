@@ -130,9 +130,9 @@ default.e2e_lr = default.base_lr
 default.e2e_lr_step = '7'
 # default rpn
 default.rpn_prefix = 'model/rpn'
-default.rpn_epoch = 10
+default.rpn_epoch = 12
 default.rpn_lr = default.base_lr
-default.rpn_lr_step = '6'
+default.rpn_lr_step = '6, 9'
 # default rcnn
 default.rcnn_prefix = 'model/rcnn'
 default.rcnn_epoch = 8
