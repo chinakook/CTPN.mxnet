@@ -27,7 +27,6 @@ from distutils.util import strtobool
 
 from rcnn.logger import logger
 from rcnn.processing.bbox_transform import bbox_pred_ctpn, clip_boxes
-from rcnn.processing.generate_anchor import generate_anchors
 from rcnn.processing.text_anchor import text_anchors
 
 from rcnn.processing.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
