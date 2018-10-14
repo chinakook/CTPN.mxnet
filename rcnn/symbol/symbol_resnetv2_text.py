@@ -25,32 +25,36 @@ from mxnet.gluon import nn
 from mxnet.gluon import rnn
 from mxnet.gluon.model_zoo import vision
 
-backbone = vision.vgg16()
+backbone = vision.resnet101_v1()
 
 class CTPN(gluon.HybridBlock):
     def __init__(self, **kwargs):
         super(CTPN, self).__init__(**kwargs)
         with self.name_scope():
-            self.detect_base = backbone.features[:30]
-            self.rpn_conv = nn.Conv2D(512, (3,3), strides=(1,1), padding=(1,1))
-            self.biRnn = rnn.LSTM(128, 1, 'NTC', dropout=0.5, bidirectional=True)
-            self.proj = nn.Dense(512, flatten=False)
+            self.detect_base = backbone.features[:7]
+            self.relu0 = nn.Activation('relu')
+            #self.rpn_conv = nn.Conv2D(512, (3,3), strides=(1,1), padding=(1,1))
+            self.biRnn = rnn.LSTM(128, 1, 'NTC', dropout=0, bidirectional=True)
+            self.proj = nn.Dense(1024, flatten=False)
+            self.relu1 = nn.Activation('relu')
+
     def hybrid_forward(self, F, x, **kwargs):
         x = self.detect_base(x)
-        x = self.rpn_conv(x)
+        x = self.relu0(x)
+        #x = self.rpn_conv(x)
         x_t0 = F.transpose(x, axes=(0, 2, 3, 1))
         x_t = F.reshape(x_t0, shape=(-3, -2))
         lstm_o = self.biRnn(x_t)
         pred = self.proj(lstm_o)
         pred = F.reshape_like(pred, x_t0)
         pred = F.transpose(pred, axes=(0, 3, 1, 2))
-        out = F.Activation(pred, act_type="relu")
+        out = self.relu1(pred)
         return out
 
 net = CTPN(prefix='ctpn0_')
 
 
-def get_vgg_ctpn_base(data, num_anchors):
+def get_resnetv1_text_ctpn_base(data, num_anchors):
     rpn_relu = net(data)
     rpn_cls_score = mx.symbol.Convolution(
         data=rpn_relu, kernel=(1, 1), pad=(0, 0), num_filter=2 * num_anchors, name="rpn_cls_score")
@@ -61,7 +65,7 @@ def get_vgg_ctpn_base(data, num_anchors):
     return rpn_cls_score_reshape, rpn_bbox_pred
 
 
-def get_vgg_text_rpn(num_anchors=10):
+def get_resnetv1_text_rpn(num_anchors=10):
     """
     Region Proposal Network with VGG
     :param num_anchors: used to determine output size
@@ -72,7 +76,7 @@ def get_vgg_text_rpn(num_anchors=10):
     bbox_target = mx.symbol.Variable(name='bbox_target')
     bbox_weight = mx.symbol.Variable(name='bbox_weight')
 
-    rpn_cls_score_reshape, rpn_bbox_pred = get_vgg_ctpn_base(data, num_anchors)
+    rpn_cls_score_reshape, rpn_bbox_pred = get_resnetv1_text_ctpn_base(data, num_anchors)
 
 
     # classification
@@ -86,7 +90,7 @@ def get_vgg_text_rpn(num_anchors=10):
     return group
 
 
-def get_vgg_text_rpn_test(num_anchors=10):
+def get_resnetv1_text_rpn_test(num_anchors=10):
     """
     Region Proposal Network with VGG
     :param num_anchors: used to determine output size
@@ -95,7 +99,7 @@ def get_vgg_text_rpn_test(num_anchors=10):
     data = mx.symbol.Variable(name="data")
     im_info = mx.symbol.Variable(name='im_info')
 
-    rpn_cls_score_reshape, rpn_bbox_pred = get_vgg_ctpn_base(data, num_anchors)
+    rpn_cls_score_reshape, rpn_bbox_pred = get_resnetv1_text_ctpn_base(data, num_anchors)
 
 
     rpn_cls_prob = mx.symbol.SoftmaxActivation(

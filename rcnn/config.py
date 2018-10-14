@@ -118,8 +118,8 @@ default.base_lr = 0.004
 default.dataset = 'OCRDB'
 default.image_set = 'train'
 default.test_image_set = 'val'
-default.root_path = r'/mnt/15F1B72E1A7798FD/DK2/mpout'
-default.dataset_path = r'/mnt/15F1B72E1A7798FD/DK2/mpout'
+default.root_path = r'/home/kk/data/mpout'
+default.dataset_path = r'/home/kk/data/mpout'
 # default training
 default.frequent = 20
 default.kvstore = 'device'
@@ -142,19 +142,15 @@ default.rcnn_lr_step = '6'
 # network settings
 network = edict()
 
-network.vgg = edict()
-
 network.vgg_text = edict()
 
-network.resnet = edict()
-network.resnet.pretrained = 'model/resnet-101'
-network.resnet.pretrained_epoch = 0
-network.resnet.PIXEL_MEANS = np.array([0, 0, 0])
-network.resnet.IMAGE_STRIDE = 0
-network.resnet.RPN_FEAT_STRIDE = 16
-network.resnet.RCNN_FEAT_STRIDE = 16
-network.resnet.FIXED_PARAMS = ['conv0', 'stage1', 'gamma', 'beta']
-network.resnet.FIXED_PARAMS_SHARED = ['conv0', 'stage1', 'stage2', 'stage3', 'gamma', 'beta']
+network.resnetv1_text = edict()
+network.resnetv1_text.pretrained = 'model/resnet101_v1'
+network.resnetv1_text.pretrained_epoch = 0
+network.resnetv1_text.IMAGE_STRIDE = 0
+network.resnetv1_text.RPN_FEAT_STRIDE = 16
+network.resnetv1_text.RCNN_FEAT_STRIDE = 16
+network.resnetv1_text.FIXED_PARAMS = [] #['resnetv10_conv0', 'resnetv10_stage1', 'gamma', 'beta']
 
 # dataset settings
 dataset = edict()

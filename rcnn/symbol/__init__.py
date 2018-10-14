@@ -16,3 +16,4 @@
 # under the License.
 
 from .symbol_vgg_text import *
+from .symbol_resnetv2_text import *

@@ -121,11 +121,11 @@ def build_voc_dirs(outdir):
                                                                                                  'Main')
 
 if __name__ == '__main__':
-    in_path = r'/mnt/15F1B72E1A7798FD/DK2/mp'
+    in_path = r'/home/kk/data/mp'
     
     xmllist = [os.path.join(in_path, _) for _ in os.listdir(in_path) if _.endswith('.xml')]
 
-    out_path = r'/mnt/15F1B72E1A7798FD/DK2/mpout'
+    out_path = r'/home/kk/data/mpout'
 
     out_xml_path, out_img_path, out_main_path = build_voc_dirs(out_path)
 

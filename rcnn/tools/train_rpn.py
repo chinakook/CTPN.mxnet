@@ -22,7 +22,6 @@ import mxnet as mx
 from ..logger import logger
 from ..config import config, default, generate_config
 from ..symbol import *
-from ..symbol.gensym import gen_sym
 from ..core import callback, metric
 from ..core.loader import AnchorLoader
 from ..utils.load_data import load_gt_roidb, merge_roidb, filter_roidb
@@ -36,8 +35,9 @@ def train_rpn(network, dataset, image_set, root_path, dataset_path,
     # setup config
     config.TRAIN.BATCH_IMAGES = 1
 
-
-    feat_sym = eval('get_' + network + '_conv')(mx.symbol.Variable(name="data"))
+    # load symbol
+    sym = eval('get_' + network + '_rpn')()
+    feat_sym = sym.get_internals()['rpn_cls_score_output']
 
     # setup multi-gpu
     batch_size = len(ctx)
@@ -68,8 +68,7 @@ def train_rpn(network, dataset, image_set, root_path, dataset_path,
     # infer shape
     data_shape_dict = dict(train_data.provide_data + train_data.provide_label)
 
-    # load symbol
-    sym = gen_sym()
+
 
     arg_shape, out_shape, aux_shape = sym.infer_shape(**data_shape_dict)
     arg_shape_dict = dict(zip(sym.list_arguments(), arg_shape))
@@ -82,8 +81,11 @@ def train_rpn(network, dataset, image_set, root_path, dataset_path,
         arg_params, aux_params = load_param(prefix, begin_epoch, convert=True)
     else:
         arg_params, aux_params = load_param(pretrained, epoch, convert=True)
-        arg_params['ctpn0_conv0_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_conv0_weight'])
-        arg_params['ctpn0_conv0_bias'] = mx.nd.zeros(shape=arg_shape_dict['ctpn0_conv0_bias'])
+
+        if 'ctpn0_conv0_weight' in arg_shape_dict:
+            arg_params['ctpn0_conv0_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['ctpn0_conv0_weight'])
+        if 'ctpn0_conv0_bias' in arg_shape_dict:
+            arg_params['ctpn0_conv0_bias'] = mx.nd.zeros(shape=arg_shape_dict['ctpn0_conv0_bias'])
 
         arg_params['rpn_cls_score_weight'] = mx.random.normal(0, 0.01, shape=arg_shape_dict['rpn_cls_score_weight'])
         arg_params['rpn_cls_score_bias'] = mx.nd.zeros(shape=arg_shape_dict['rpn_cls_score_bias'])
