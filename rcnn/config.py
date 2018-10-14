@@ -150,7 +150,7 @@ network.resnetv1_text.pretrained_epoch = 0
 network.resnetv1_text.IMAGE_STRIDE = 0
 network.resnetv1_text.RPN_FEAT_STRIDE = 16
 network.resnetv1_text.RCNN_FEAT_STRIDE = 16
-network.resnetv1_text.FIXED_PARAMS = [] #['resnetv10_conv0', 'resnetv10_stage1', 'gamma', 'beta']
+network.resnetv1_text.FIXED_PARAMS = ['resnetv10_conv0', 'resnetv10_stage1', 'gamma', 'beta']
 
 # dataset settings
 dataset = edict()
